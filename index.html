@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex Email Extractor | Free Email Extraction Tool</title>
+    <meta name="description" content="Free Apex Email Extractor tool. Extract emails from websites, documents, and text. Build targeted contact lists for your construction business.">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="../../css/styles.css">
+    
+    <style>
+        /* Tool-specific styles */
+        .tool-main {
+            padding-top: 100px;
+            min-height: calc(100vh - 300px);
+        }
+        
+        .tool-workspace {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        @media (max-width: 1024px) {
+            .tool-workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .tool-panel {
+            background: var(--color-white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            padding: 30px;
+        }
+        
+        .tool-panel h2 {
+            color: var(--color-primary);
+            font-size: var(--font-size-xl);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tool-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 1px solid var(--color-gray-300);
+            border-radius: var(--radius-md);
+            font-family: 'Inter', sans-serif;
+            font-size: var(--font-size-sm);
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+        
+        .tool-textarea:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+        }
+        
+        .tool-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .tool-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: var(--font-size-sm);
+        }
+        
+        .tool-btn-primary {
+            background: var(--color-primary);
+            color: white;
+        }
+        
+        .tool-btn-primary:hover {
+            background: var(--color-primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .tool-btn-secondary {
+            background: var(--color-gray-100);
+            color: var(--color-gray-700);
+        }
+        
+        .tool-btn-secondary:hover {
+            background: var(--color-gray-200);
+        }
+        
+        .tool-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .tool-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 600px) {
+            .tool-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .stat-card {
+            background: var(--color-gray-50);
+            padding: 15px;
+            border-radius: var(--radius-lg);
+            text-align: center;
+        }
+        
+        .stat-card-value {
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+        
+        .stat-card-label {
+            font-size: var(--font-size-xs);
+            color: var(--color-gray-500);
+            margin-top: 5px;
+        }
+        
+        .tool-log {
+            background: var(--color-gray-900);
+            color: var(--color-white);
+            padding: 15px;
+            border-radius: var(--radius-md);
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            height: 150px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        
+        .results-panel {
+            background: var(--color-gray-50);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            height: 100%;
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--color-gray-200);
+        }
+        
+        .results-header h3 {
+            color: var(--color-primary);
+            font-size: var(--font-size-lg);
+        }
+        
+        .email-count-badge {
+            background: var(--color-primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+        }
+        
+        .email-list {
+            background: white;
+            border: 1px solid var(--color-gray-200);
+            border-radius: var(--radius-md);
+            padding: 15px;
+            min-height: 300px;
+            max-height: 500px;
+            overflow-y: auto;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .email-list:empty::before {
+            content: "Emails will appear here as they're found...";
+            color: var(--color-gray-400);
+            font-style: italic;
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            background: var(--color-gray-100);
+            color: var(--color-gray-600);
+        }
+        
+        .status-badge.running {
+            background: rgba(72, 187, 120, 0.1);
+            color: #38a169;
+        }
+        
+        .status-badge.completed {
+            background: rgba(49, 130, 206, 0.1);
+            color: var(--color-accent);
+        }
+        
+        .status-badge.error {
+            background: rgba(245, 101, 101, 0.1);
+            color: #e53e3e;
+        }
+        
+        .page-title {
+            text-align: center;
+            padding: 40px 0;
+        }
+        
+        .page-title h1 {
+            color: #000000;
+            font-size: var(--font-size-3xl);
+            margin-bottom: 10px;
+        }
+        
+        .page-title p {
+            color: #000000;
+            font-size: var(--font-size-lg);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <a href="/" class="logo">
+                    <img src="https://www.apexaccuracyestimatinginc.com/wp-content/uploads/2024/08/Apex-logo-2-2048x1486.png" alt="Apex Accuracy Estimating" class="logo-img" width="100" height="100">
+                    <span class="logo-text">Apex Accuracy Estimating Tools</span>
+                </a>
+                <ul class="nav-links pill-nav">
+                    <li><a href="/" class="nav-link">Home</a></li>
+                    <li><a href="../" class="nav-link">Marketing Tools</a></li>
+                    <li><a href="/#about" class="nav-link">About</a></li>
+                    <li><a href="/#contact" class="nav-link">Contact</a></li>
+                </ul>
+                <a href="https://apexaccuracyestimatinginc.com" class="btn btn-primary">Get Estimating Services</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="tool-main">
+        <div class="container">
+            <div class="page-title">
+                <h1>Apex Email Extractor</h1>
+                <p>Extract emails from websites instantly. Build targeted contact lists for your business.</p>
+            </div>
+            
+            <div class="tool-workspace">
+                <!-- Left Panel: Controls -->
+                <div class="tool-panel">
+                    <h2>Paste URLs to Scrape</h2>
+                    
+                    <textarea id="urls" class="tool-textarea" placeholder="Enter website URLs (one per line)...&#10;example.com&#10;github.com&#10;python.org">github.com
+python.org
+stackoverflow.com</textarea>
+                    
+                    <div class="tool-controls">
+                        <label style="font-size:14px; color: var(--color-gray-600);">Threads:</label>
+                        <input type="number" id="workers" value="50" min="10" max="100" style="width:70px; padding:8px; border-radius:6px; border:1px solid var(--color-gray-300);">
+                        <button class="tool-btn tool-btn-primary" id="startBtn" onclick="startScrape()">Start Extraction</button>
+                        <button class="tool-btn tool-btn-secondary" id="stopBtn" onclick="stopScrape()" disabled>Stop</button>
+                        <span class="status-badge" id="status">Ready</span>
+                    </div>
+
+                    <div class="tool-stats">
+                        <div class="stat-card">
+                            <div class="stat-card-value" id="s-processed">0</div>
+                            <div class="stat-card-label">Processed</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-value" id="s-found">0</div>
+                            <div class="stat-card-label">Emails Found</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-value" id="s-errors" style="color: #e53e3e;">0</div>
+                            <div class="stat-card-label">Errors</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-value" id="s-speed">0</div>
+                            <div class="stat-card-label">URLs/min</div>
+                        </div>
+                    </div>
+
+                    <div class="tool-log" id="log">Ready to extract emails...</div>
+                </div>
+                
+                <!-- Right Panel: Email List -->
+                <div class="results-panel">
+                    <div class="results-header">
+                        <h3>Found Emails</h3>
+                        <span class="email-count-badge" id="email-count">0</span>
+                    </div>
+                    <button class="tool-btn tool-btn-secondary" id="copyBtn" onclick="copyEmails()" style="margin-bottom: 15px; width: 100%;">Copy All Emails</button>
+                    <div class="email-list" id="email-list"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="/" class="logo">
+                        <img src="https://www.apexaccuracyestimatinginc.com/wp-content/uploads/2024/07/white-blue-2048x1486.png" alt="Apex Accuracy Estimating" class="logo-img" width="100" height="100">
+                        <span class="logo-text">Apex Accuracy Estimating</span>
+                    </a>
+                    <p class="footer-desc">Professional construction estimating services and free marketing tools for contractors.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/#tools">All Tools</a></li>
+                        <li><a href="https://apexaccuracyestimatinginc.com">Main Site</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Marketing Tools</h4>
+                    <ul>
+                        <li><a href="./">Email Extractor</a></li>
+                        <li><a href="../email-cleaner/">Email Cleaner</a></li>
+                        <li><a href="../Email-Sorter/">Email Sorter</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Apex Accuracy Estimating Inc. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../../js/main.js" defer></script>
+    <script>
+        const BACKEND_URL = "https://f6560415-6ee5-4653-8dd7-2bab893eee0e-00-2yryksvhkaet3.pike.replit.dev";
+        
+        let ws, emailSet = new Set(), reconnectAttempts = 0;
+        const MAX_RECONNECT = 5;
+        
+        function log(msg) {
+            const el = document.getElementById('log');
+            el.innerHTML += `[${new Date().toLocaleTimeString()}] ${msg}\n`;
+            el.scrollTop = el.scrollHeight;
+        }
+        
+        function connect() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(protocol + '//' + new URL(BACKEND_URL).host + '/ws');
+            
+            ws.onopen = () => { log('Connected'); reconnectAttempts = 0; updateStatus('Ready'); };
+            ws.onmessage = (e) => {
+                const data = JSON.parse(e.data);
+                if(data.processed !== undefined) {
+                    document.getElementById('s-processed').textContent = data.processed.toLocaleString();
+                    document.getElementById('s-found').textContent = data.found.toLocaleString();
+                    document.getElementById('s-errors').textContent = data.errors.toLocaleString();
+                    document.getElementById('s-speed').textContent = parseFloat(data.speed) || 0;
+                    updateStatus(data.status);
+                    document.getElementById('email-count').textContent = emailSet.size;
+                }
+                if(data.emails) {
+                    const list = document.getElementById('email-list');
+                    let count = 0;
+                    data.emails.forEach(email => {
+                        if(email && !emailSet.has(email)) {
+                            emailSet.add(email);
+                            list.textContent += email + '\n';
+                            count++;
+                        }
+                    });
+                    if(count) {
+                        list.scrollTop = list.scrollHeight;
+                        document.getElementById('email-count').textContent = emailSet.size;
+                        log(`+${count} emails found`);
+                    }
+                }
+                if(data.status === 'Completed') {
+                    log('Completed!');
+                    document.getElementById('startBtn').disabled = false;
+                    document.getElementById('stopBtn').disabled = true;
+                }
+            };
+            ws.onclose = () => {
+                log('Disconnected');
+                if(reconnectAttempts++ < MAX_RECONNECT) setTimeout(connect, 2000 * reconnectAttempts);
+            };
+        }
+        
+        function updateStatus(s) {
+            const el = document.getElementById('status');
+            el.textContent = s;
+            el.className = 'status-badge' + (s === 'Running' ? ' running' : s === 'Completed' ? ' completed' : '');
+        }
+        
+        function copyEmails() {
+            const text = document.getElementById('email-list').textContent.trim();
+            if(!text) return log('No emails');
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById('copyBtn');
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = 'Copy All Emails', 2000);
+            });
+        }
+        
+        function startScrape() {
+            const urls = document.getElementById('urls').value.split('\n').map(u => u.trim()).filter(u => u);
+            if(!urls.length) return log('Enter URLs');
+            if(!ws || ws.readyState !== WebSocket.OPEN) { log('Reconnecting...'); connect(); setTimeout(startScrape, 1000); return; }
+            
+            emailSet.clear();
+            document.getElementById('email-list').textContent = '';
+            ['s-processed','s-found','s-errors','s-speed','email-count'].forEach(id => document.getElementById(id).textContent = '0');
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = false;
+            updateStatus('Running');
+            log(`Starting: ${urls.length} URLs`);
+            ws.send(JSON.stringify({ action: 'start', urls, workers: parseInt(document.getElementById('workers').value) || 50 }));
+        }
+        
+        function stopScrape() { if(ws) ws.send(JSON.stringify({ action: 'stop' })); }
+        
+        document.addEventListener('keydown', (e) => { if(e.ctrlKey && e.key === 'Enter' && !document.getElementById('startBtn').disabled) startScrape(); });
+        connect();
+    </script>
+</body>
+</html>
