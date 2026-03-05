@@ -1,3 +1,8 @@
+# Easy Way
+
+Go to site: https://tools.apexaccuracyestimatinginc.com/Marketing%20Tools/Free-Email-Extractor/
+
+
 # Free Email Extractor
 
 Free Email Extractor is a simple tool that extracts email addresses from websites.  
